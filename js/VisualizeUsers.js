@@ -49,13 +49,18 @@ function init(){
   var element = document.createElement( 'div' );
   // element.style.width = '100px';
   // element.style.height = '100px';
-  element.style.opacity = 0.5;
+  element.style.opacity = 0.8;
   element.innerHTML = "Hello World! How you doing?";
   element.style.fontSize = '1.5em';
+  
   // element.style.background = new THREE.Color( 0x0082fa ).getStyle();
   element.style.color = new THREE.Color(0xffffff).getStyle();
 
   tooltip = new THREE.CSS2DObject(element);
+  
+  
+
+  
 
   // var tmpParticles = RandomParticles(1000, -100, 100, 10);
   var tmpParticles = CreateParticles(data);
@@ -96,6 +101,35 @@ function init(){
     }
     
   });
+
+  window.addEventListener("click", function(){
+    //event.preventDefault();
+
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+    var orthoPosition = new THREE.Vector3(mouse.x, mouse.y, -1);
+    orthoPosition.unproject(cameraCSS);
+
+
+    // Raycast
+    raycaster.setFromCamera(mouse, cameraGL);
+    var intersects = raycaster.intersectObjects(sceneGL.children);
+
+    if (intersects.length > 0){
+      var current_intersect = intersects[0]
+      
+      document.getElementById('user_image').href=current_intersect.user_data.url;
+      document.getElementById('user_image_image').style.backgroundImage="url('"+ current_intersect.user_data.profile_image_url +"')";
+      
+      
+      
+    } else {
+     
+    }
+    
+  });
+
 
   window.addEventListener("resize", function(){
     var WIDTH = window.innerWidth;
