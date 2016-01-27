@@ -13,6 +13,8 @@ hash_tags_re = re.compile(r'(?u)#\w+') # Used to find all hash tags within tweet
 user_tags_re = re.compile(r'(?u)@\w+') # Used to find all users taged in tweet
 tokenizer_re = re.compile(r'(?u)\w+') # Used to tokenize texts
 
+#==================================================================================================
+
 def reduce_dimensionality(distances, num_dimensions=3):
   distances = np.array(distances)
 
@@ -21,6 +23,8 @@ def reduce_dimensionality(distances, num_dimensions=3):
   reduced_dimensionality = tsne.fit_transform(distances)
 
   return reduced_dimensionality
+
+#==================================================================================================
 
 def calculate_distance(tfidf_scores, vocab_size):
   """
@@ -49,6 +53,8 @@ def calculate_distance(tfidf_scores, vocab_size):
     distance.append(1 - cosine_sim[row])
 
   return distance
+
+#==================================================================================================
 
 def calculate_tfidf(user_tweets):
   """
@@ -85,6 +91,8 @@ def calculate_tfidf(user_tweets):
 
   return tfidf_score, len(dictionary.keys())
 
+#==================================================================================================
+
 def tokenize_text(text):
   """
     Tokenizes the text and returns a list of words in it
@@ -115,6 +123,8 @@ def tokenize_text(text):
 
   return words_in_text
 
+#==================================================================================================
+
 def filter_users_ids(users, tweets):
   """
     Filters out users that don't have tweets and that the ALIEN tag is set to None
@@ -142,6 +152,8 @@ def filter_users_ids(users, tweets):
 
   return users_id
 
+#==================================================================================================
+
 def filter_users(users, users_id):
   """
     Returns a list of users who have a user id in users_id
@@ -165,6 +177,8 @@ def filter_users(users, users_id):
       new_users.append(user)
 
   return new_users
+
+#==================================================================================================
 
 def merge_user_tweets(users_id, tweets, new_users):
   """
@@ -197,6 +211,8 @@ def merge_user_tweets(users_id, tweets, new_users):
     user_tweets.append(' '.join(user_tweets_dict[user['id']]))
 
   return user_tweets
+
+#==================================================================================================
 
 def main():
   distances = pickle.load(open('distances.cPickle'))

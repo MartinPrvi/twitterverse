@@ -86,8 +86,10 @@ function init(){
     var intersects = raycaster.intersectObjects(sceneGL.children);
 
     if (intersects.length > 0){
-      console.log(intersects[0]);
-      tooltip.element.innerHTML = "Screen Name: " + intersects[0].object.geometry.vertices[intersects[0].index].screenname;
+      var tooltip_html = []
+      tooltip_html.push(intersects[0].object.geometry.vertices[intersects[0].index].screenname)
+      
+      tooltip.element.innerHTML = tooltip_html.join('')
       sceneCSS.add(tooltip);
     } else {
       sceneCSS.remove(tooltip);
