@@ -192,7 +192,7 @@ function CreateParticles(data){
     );
 
     var tmpParticle = new Particle(tmpPosition);
-    tmpParticle.geometry.screenname = data[i].screenname;
+    tmpParticle.geometry.user_data = data[i];
     part.push(tmpParticle);         
   }
 
