@@ -34,7 +34,7 @@ function init(){
 
   // Renderers
   rendererGL = new THREE.WebGLRenderer();
-  rendererGL.setClearColor(0x333F47, 1);
+  rendererGL.setClearColor(0x21a22, 1);
   rendererGL.setSize(width, height);
   rendererGL.sortObjects = false;
   document.body.appendChild(rendererGL.domElement);
@@ -92,7 +92,7 @@ function init(){
 
     if (intersects.length > 0){
       var tooltip_html = []
-      tooltip_html.push(intersects[0].object.geometry.vertices[intersects[0].index].screenname)
+      tooltip_html.push(intersects[0].object.geometry.vertices[intersects[0].index].user_data.screenname)
       
       tooltip.element.innerHTML = tooltip_html.join('')
       sceneCSS.add(tooltip);
@@ -104,7 +104,7 @@ function init(){
 
   window.addEventListener("click", function(){
     //event.preventDefault();
-
+    document.getElementById('details_box').style.display='block';
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
@@ -117,16 +117,23 @@ function init(){
     var intersects = raycaster.intersectObjects(sceneGL.children);
 
     if (intersects.length > 0){
-      var current_intersect = intersects[0]
-      
-      document.getElementById('user_image').href=current_intersect.user_data.url;
+      var current_intersect = intersects[0].object.geometry.vertices[intersects[0].index]
+      tw_href = 'https://www.twitter.com/'+current_intersect.user_data.screenname;
+      document.getElementById('user_image').href=tw_href;
       document.getElementById('user_image_image').style.backgroundImage="url('"+ current_intersect.user_data.profile_image_url +"')";
+      var name_div = document.getElementById('name')
+      name_div.href = tw_href;
+      name_div.innerHTML = current_intersect.user_data.name;
       
+      var nick_div = document.getElementById('nick')
+      nick_div.href = tw_href;
+      nick_div.innerHTML = current_intersect.user_data.screenname;
+      document.getElementById('count').innerHTML=current_intersect.user_data.followers_count+'<span> Followers</span>'
+      document.getElementById('tw_details').href='http://www.time.mk/twitter/user/'+current_intersect.user_data.screenname;
+      document.getElementById('content_bottom').innerHTML=current_intersect.user_data.description
       
-      
-    } else {
-     
     }
+    
     
   });
 
