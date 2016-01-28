@@ -104,7 +104,7 @@ function init(){
 
   window.addEventListener("click", function(){
     //event.preventDefault();
-    document.getElementById('details_box').style.display='block';
+    
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
@@ -117,6 +117,7 @@ function init(){
     var intersects = raycaster.intersectObjects(sceneGL.children);
 
     if (intersects.length > 0){
+      document.getElementById('details_box').style.display='block';
       var current_intersect = intersects[0].object.geometry.vertices[intersects[0].index]
       tw_href = 'https://www.twitter.com/'+current_intersect.user_data.screenname;
       document.getElementById('user_image').href=tw_href;
