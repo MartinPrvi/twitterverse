@@ -1,8 +1,13 @@
+'''
+  Run Forest, Run
+'''
 import json
 
 import cPickle as pickle
 
-def generate_json(users, reduced_dimensionality):
+#==================================================================================================
+
+def generate_json(users, reduced_dimensionality, file_name, data_name):
   data = []
 
   for i in xrange(len(users)):
@@ -17,17 +22,19 @@ def generate_json(users, reduced_dimensionality):
 
     data.append(tmp_user)
 
-  JSON = 'var data = ' + json.dumps(data)
+  JSON = 'var {0} = '.format(data_name) + json.dumps(data)
 
-  writer = open('js/data.json', 'w')
+  writer = open('js/{0}'.format(file_name), 'w')
   writer.write(JSON)
   writer.close()
+
+#==================================================================================================
 
 def main():
   new_users = pickle.load(open('Data/new_users.cPickle'))
   reduced_dimensionality = pickle.load(open('Data/reduced_dimensionality.cPickle'))
 
-  generate_json(new_users, reduced_dimensionality)
+  generate_json(new_users, reduced_dimensionality, 'data.json', 'data')
 
 if __name__=='__main__':
   main()
