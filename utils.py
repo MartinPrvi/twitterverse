@@ -306,14 +306,14 @@ def merge_user_tweets(users_id, tweets, new_users):
 
 def main():
   '''Reduce Dimensionality'''
-  distances = np.array(pickle.load(open('Data/distances.cPickle', 'rb')))
-  distances[distances < 0.0] = 0.0
-  distances = np.nan_to_num(distances)
+  # distances = np.array(pickle.load(open('Data/distances.cPickle', 'rb')))
+  # distances[distances < 0.0] = 0.0
+  # distances = np.nan_to_num(distances)
 
-  print 'Started calculating'
-  reduced_dimensionality = reduce_dimensionality(distances)
+  # print 'Started calculating'
+  # reduced_dimensionality = reduce_dimensionality(distances)
 
-  pickle.dump(reduced_dimensionality, open('reduced_dimensionality.cPickle', 'wb'))
+  # pickle.dump(reduced_dimensionality, open('reduced_dimensionality.cPickle', 'wb'))
   #================================================================================================
   '''Generate User Coms'''
   # tweets = pickle.load(open('Data/mk_tweets_2015.cPickle', 'rb'))

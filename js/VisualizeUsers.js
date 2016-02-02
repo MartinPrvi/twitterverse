@@ -83,7 +83,8 @@ function init(){
     particles.vertices.push(tmpParticles[i].geometry);
   }
 
-  var particleSystem = new THREE.ParticleSystem(particles);
+  var material = new THREE.PointsMaterial({color: 0xfffffa});
+  var particleSystem = new THREE.ParticleSystem(particles, material);
   sceneGL.add(particleSystem);
 
   window.addEventListener("mousemove", function(){
