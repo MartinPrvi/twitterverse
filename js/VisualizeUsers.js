@@ -20,7 +20,7 @@ function init(){
   sceneCSS = new THREE.Scene();
 
   // Camera
-  cameraGL = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
+  cameraGL = new THREE.PerspectiveCamera(50, width / height, 1, 10000);
   cameraGL.position.set(0, 300, 300);
 
   var viewSize = 900;
@@ -49,7 +49,7 @@ function init(){
   var element = document.createElement( 'div' );
   // element.style.width = '100px';
   // element.style.height = '100px';
-  element.style.opacity = 0.8;
+  element.style.opacity = 1;
   element.innerHTML = "Hello World! How you doing?";
   element.style.fontSize = '1.5em';
   
@@ -63,7 +63,8 @@ function init(){
   
 
   // var tmpParticles = RandomParticles(1000, -100, 100, 10);
-  var tmpParticles = CreateParticles(data);
+  var tmpParticles = CreateParticles(communication_data);
+  //var tmpParticles = CreateParticles(data);
 
   console.log(tmpParticles);
 
@@ -92,8 +93,16 @@ function init(){
 
     if (intersects.length > 0){
       var tooltip_html = []
+      tooltip_html.push('<div class="tooltip">')
+      tooltip_html.push('<a target="_blank" href="#" class="user_image"> <span class="user_image_image" style="background-image:url(\'')
+      tooltip_html.push(intersects[0].object.geometry.vertices[intersects[0].index].user_data.profile_image_url)
+      tooltip_html.push('\')"></span> </a><div class="content"><div class="content_top"><a target="_blank" href="#" class="name">')
+      tooltip_html.push(intersects[0].object.geometry.vertices[intersects[0].index].user_data.name)
+      tooltip_html.push('</a><br><a target="_blank" href="#" class="nick">@')
       tooltip_html.push(intersects[0].object.geometry.vertices[intersects[0].index].user_data.screenname)
-      
+      tooltip_html.push('</a></div>')
+    
+      tooltip_html.push('</div>')
       tooltip.element.innerHTML = tooltip_html.join('')
       sceneCSS.add(tooltip);
     } else {
