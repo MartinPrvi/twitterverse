@@ -1,7 +1,9 @@
 var sceneGL, cameraGL, rendererGL;
 var sceneCSS, rendererCSS, cameraCSS;
-var controls;
+var mouse_controls;
+var keyboard_controls;
 var tooltip;
+var clock;
 
 var mouse = new THREE.Vector2();
 var particles = new THREE.Geometry();
@@ -11,6 +13,9 @@ var raycaster = new THREE.Raycaster();
 // var colors = getColors(3419, 10);
 
 function init(){
+  // Initialize the CLOCK (time)
+  clock = new THREE.Clock();
+
   // height and width of window
   var height = window.innerHeight;
   var width = window.innerWidth;
@@ -29,8 +34,14 @@ function init(){
   cameraCSS.position.set(0, 0, 10);
 
   // Controls
-  controls = new THREE.TrackballControls(cameraGL);
-  controls.zoomSpeed = 0.7;
+  mouse_controls = new THREE.TrackballControls(cameraGL);
+  mouse_controls.zoomSpeed = 0.7;
+
+  keyboard_controls = new THREE.FlyControls(cameraGL);
+  keyboard_controls.movementSpeed = 1000;
+  keyboard_controls.rollSpeed = Math.PI / 4.0;
+  keyboard_controls.autoForward = false;
+  keyboard_controls.dragToLook = false;
 
   // Renderers
   rendererGL = new THREE.WebGLRenderer();
@@ -159,12 +170,15 @@ function init(){
 }
 
 function animate(){
+  var delta = clock.getDelta();
+
   requestAnimationFrame(animate);
 
   rendererGL.render(sceneGL, cameraGL);
   rendererCSS.render(sceneCSS, cameraCSS);
 
-  controls.update();
+  keyboard_controls.update(delta);
+  // mouse_controls.update();
 }
 
 function CreateParticles(data){
