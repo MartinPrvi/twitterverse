@@ -178,6 +178,8 @@ function init(){
 
 }
 
+var control_method = 'keyboard'
+
 function animate(){
   var delta = clock.getDelta();
 
@@ -186,8 +188,28 @@ function animate(){
   rendererGL.render(sceneGL, cameraGL);
   rendererCSS.render(sceneCSS, cameraCSS);
 
-  keyboard_controls.update(delta);
+
+  if (control_method == 'mouse'){
+    mouse_controls.update();
+    document.getElementById('toggle').innerHTML="Mouse mode"
+  }
+  else{
+    keyboard_controls.update(delta);
+    document.getElementById('toggle').innerHTML="Keyboard mode"
+  }
   // mouse_controls.update();
+}
+
+function search(){
+}
+
+function toggle_control_method(){
+  if (control_method == 'keyboard'){
+    control_method = 'mouse'
+  }
+  else{
+    control_method = 'keyboard'
+  }
 }
 
 function CreateParticles(data){
