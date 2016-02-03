@@ -7,10 +7,14 @@ var clock;
 
 var mouse = new THREE.Vector2();
 var particles = new THREE.Geometry();
+var temp_particles = null;
+var temp_material = new THREE.PointsMaterial({color: 0xcc0000});
 
 var raycaster = new THREE.Raycaster();
 
 // var colors = getColors(3419, 10);
+var temp_particle_system = null
+var click_particle_system = null
 
 function init(){
   // Initialize the CLOCK (time)
@@ -102,16 +106,33 @@ function init(){
     // Raycast
     raycaster.setFromCamera(mouse, cameraGL);
     var intersects = raycaster.intersectObjects(sceneGL.children);
-
+    
     if (intersects.length > 0){
+      current_intersect = intersects[0].object.geometry.vertices[intersects[0].index]
+      sceneGL.remove(temp_particle_system);
+      var temp_material = new THREE.PointsMaterial({color: 0xcc8800});
+      temp_particles = new THREE.Geometry();
+      
+      for (var i = 0; i < Math.min(current_intersect.user_data.nearest.length,10); i++) {
+        close_user = intersects[0].object.geometry.vertices[current_intersect.user_data.nearest[i]]
+        temp_particles.vertices.push(close_user)
+        
+        
+        
+      }
+
+
+      temp_particle_system = new THREE.ParticleSystem(temp_particles, temp_material);
+      sceneGL.add(temp_particle_system);
+    
       var tooltip_html = []
       tooltip_html.push('<div class="tooltip">')
       tooltip_html.push('<a target="_blank" href="#" class="user_image"> <span class="user_image_image" style="background-image:url(\'')
-      tooltip_html.push(intersects[0].object.geometry.vertices[intersects[0].index].user_data.profile_image_url)
+      tooltip_html.push(current_intersect.user_data.profile_image_url)
       tooltip_html.push('\')"></span> </a><div class="content"><div class="content_top"><a target="_blank" href="#" class="name">')
-      tooltip_html.push(intersects[0].object.geometry.vertices[intersects[0].index].user_data.name)
+      tooltip_html.push(current_intersect.user_data.name)
       tooltip_html.push('</a><br><a target="_blank" href="#" class="nick">@')
-      tooltip_html.push(intersects[0].object.geometry.vertices[intersects[0].index].user_data.screenname)
+      tooltip_html.push(current_intersect.user_data.screenname)
       tooltip_html.push('</a></div>')
     
       tooltip_html.push('</div>')
@@ -119,6 +140,8 @@ function init(){
       sceneCSS.add(tooltip);
     } else {
       sceneCSS.remove(tooltip);
+      sceneGL.remove(temp_particle_system);
+      temp_particle_system=null
     }
     
   });
@@ -153,7 +176,20 @@ function init(){
       document.getElementById('count').innerHTML=current_intersect.user_data.followers_count+'<span> Followers</span>'
       document.getElementById('tw_details').href='http://www.time.mk/twitter/user/'+current_intersect.user_data.screenname;
       document.getElementById('content_bottom').innerHTML=current_intersect.user_data.description
+      closest = document.getElementById('closest')
+      closest.innerHTML=''
       
+      var click_material = new THREE.PointsMaterial({color: 0xcc0000});
+      sceneGL.remove(click_particle_system);
+      click_particle_system = new THREE.ParticleSystem(temp_particles, click_material);
+      sceneGL.add(click_particle_system)
+      
+      
+      for (var i = 0; i < Math.min(current_intersect.user_data.nearest.length,10); i++) {
+        close_user = intersects[0].object.geometry.vertices[current_intersect.user_data.nearest[i]]
+        
+        closest.innerHTML+='@'+close_user.user_data.screenname+'<br>'
+      }
     }
     
     
