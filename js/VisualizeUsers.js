@@ -29,7 +29,7 @@ function init(){
   sceneCSS = new THREE.Scene();
 
   // Camera
-  cameraGL = new THREE.PerspectiveCamera(50, width / height, 1, 10000);
+  cameraGL = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
   cameraGL.position.set(0, 300, 300);
 
   var viewSize = 900;
@@ -81,16 +81,16 @@ function init(){
   var tmpParticles = CreateParticles(communication_data);
   //var tmpParticles = CreateParticles(data);
 
-  console.log(tmpParticles);
+  //console.log(tmpParticles);
 
   for (var i=0, n=tmpParticles.length; i<n; i++){
     particles.vertices.push(tmpParticles[i].geometry);
   }
 
-  var material = new THREE.PointsMaterial({color: 0xfffffa});
-  var particleSystem = new THREE.ParticleSystem(particles, material);
+  var material = new THREE.PointsMaterial({color: 0xfffffa,size:3.0});
+  var particleSystem = new THREE.Points(particles, material);
   sceneGL.add(particleSystem);
-
+  sceneGL.fog = new THREE.FogExp2(0xefd1b5,0.0025)
   window.addEventListener("mousemove", function(){
     event.preventDefault();
 
@@ -110,7 +110,7 @@ function init(){
     if (intersects.length > 0){
       current_intersect = intersects[0].object.geometry.vertices[intersects[0].index]
       sceneGL.remove(temp_particle_system);
-      var temp_material = new THREE.PointsMaterial({color: 0xcc8800});
+      var temp_material = new THREE.PointsMaterial({color: 0xcc8800,size:4.0});
       temp_particles = new THREE.Geometry();
       
       for (var i = 0; i < Math.min(current_intersect.user_data.nearest.length,10); i++) {
@@ -122,7 +122,7 @@ function init(){
       }
 
 
-      temp_particle_system = new THREE.ParticleSystem(temp_particles, temp_material);
+      temp_particle_system = new THREE.Points(temp_particles, temp_material);
       sceneGL.add(temp_particle_system);
     
       var tooltip_html = []
@@ -179,9 +179,9 @@ function init(){
       closest = document.getElementById('closest')
       closest.innerHTML=''
       
-      var click_material = new THREE.PointsMaterial({color: 0xcc0000});
+      var click_material = new THREE.PointsMaterial({color: 0xcc0000,size:5.0});
       sceneGL.remove(click_particle_system);
-      click_particle_system = new THREE.ParticleSystem(temp_particles, click_material);
+      click_particle_system = new THREE.Points(temp_particles, click_material);
       sceneGL.add(click_particle_system)
       
       
@@ -215,7 +215,7 @@ function init(){
 
 }
 
-var control_method = 'keyboard'
+var control_method = 'mouse'
 
 function animate(){
   var delta = clock.getDelta();
@@ -270,9 +270,9 @@ function CreateParticles(data){
     if (data[i].position[2] > maxZ) maxZ = data[i].position[2];
   }
 
-  console.log(minX + ' ' + maxX);
-  console.log(minY + ' ' + maxY);
-  console.log(minZ + ' ' + maxZ);
+  //console.log(minX + ' ' + maxX);
+  //console.log(minY + ' ' + maxY);
+  //console.log(minZ + ' ' + maxZ);
 
   for (var i=0; i<data.length; i++){
     var tmpPosition = new THREE.Vector3(
