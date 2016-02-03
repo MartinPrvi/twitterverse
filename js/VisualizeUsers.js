@@ -4,6 +4,8 @@ var mouse_controls;
 var keyboard_controls;
 var tooltip;
 var clock;
+var users = null
+var cameraGL = null
 
 var mouse = new THREE.Vector2();
 var particles = new THREE.Geometry();
@@ -17,6 +19,8 @@ var temp_particle_system = null
 var click_particle_system = null
 
 function init(){
+  users = data;
+  //users = communication_data
   // Initialize the CLOCK (time)
   clock = new THREE.Clock();
 
@@ -78,7 +82,7 @@ function init(){
   
 
   // var tmpParticles = RandomParticles(1000, -100, 100, 10);
-  var tmpParticles = CreateParticles(data);
+  var tmpParticles = CreateParticles(users);
   //var tmpParticles = CreateParticles(data);
 
   var near_dicks = {};
@@ -104,7 +108,7 @@ function init(){
     particles.vertices.push(tmpParticles[i].geometry);
   }
 
-  var material = new THREE.PointsMaterial({color: 0xfffffa,size:3.0});
+  var material = new THREE.PointsMaterial({color: 0xfffffa,size:9.0});
   var particleSystem = new THREE.Points(particles, material);
   sceneGL.add(particleSystem);
   // sceneGL.fog = new THREE.FogExp2(0x99999999,0.0025);
@@ -127,10 +131,10 @@ function init(){
     if (intersects.length > 0){
       current_intersect = intersects[0].object.geometry.vertices[intersects[0].index]
       sceneGL.remove(temp_particle_system);
-      var temp_material = new THREE.PointsMaterial({color: 0xcc8800,size:10.0});
+      var temp_material = new THREE.PointsMaterial({color: 0xcc8800,size:20.0});
       temp_particles = new THREE.Geometry();
       
-      for (var i = 0; i < Math.min(current_intersect.user_data.nearest.length,10); i++) {
+      for (var i = 0; i < Math.min(current_intersect.user_data.nearest.length,25); i++) {
         close_user = intersects[0].object.geometry.vertices[current_intersect.user_data.nearest[i]]
         temp_particles.vertices.push(close_user)
         
@@ -178,35 +182,10 @@ function init(){
     var intersects = raycaster.intersectObjects(sceneGL.children);
 
     if (intersects.length > 0){
-      document.getElementById('details_box').style.display='block';
       var current_intersect = intersects[0].object.geometry.vertices[intersects[0].index]
-      tw_href = 'https://www.twitter.com/'+current_intersect.user_data.screenname;
-      document.getElementById('user_image').href=tw_href;
-      document.getElementById('user_image_image').style.backgroundImage="url('"+ current_intersect.user_data.profile_image_url +"')";
-      var name_div = document.getElementById('name')
-      name_div.href = tw_href;
-      name_div.innerHTML = current_intersect.user_data.name;
+      click_person(current_intersect.user_data)
       
-      var nick_div = document.getElementById('nick')
-      nick_div.href = tw_href;
-      nick_div.innerHTML = current_intersect.user_data.screenname;
-      document.getElementById('count').innerHTML=current_intersect.user_data.followers_count+'<span> Followers</span>'
-      document.getElementById('tw_details').href='http://www.time.mk/twitter/user/'+current_intersect.user_data.screenname;
-      document.getElementById('content_bottom').innerHTML=current_intersect.user_data.description
-      closest = document.getElementById('closest')
-      closest.innerHTML=''
-      
-      var click_material = new THREE.PointsMaterial({color: 0xcc0000,size:20.0});
-      sceneGL.remove(click_particle_system);
-      click_particle_system = new THREE.Points(temp_particles, click_material);
-      sceneGL.add(click_particle_system)
-      
-      
-      for (var i = 0; i < Math.min(current_intersect.user_data.nearest.length,10); i++) {
-        close_user = intersects[0].object.geometry.vertices[current_intersect.user_data.nearest[i]]
-        
-        closest.innerHTML+='@'+close_user.user_data.screenname+'<br>'
-      }
+    
     }
     
     
@@ -232,6 +211,57 @@ function init(){
 
 }
 
+function click_person(current_intersect){
+  document.getElementById('details_box').style.display='block';
+  tw_href = 'https://www.twitter.com/'+current_intersect.screenname;
+  document.getElementById('user_image').href=tw_href;
+  document.getElementById('user_image_image').style.backgroundImage="url('"+ current_intersect.profile_image_url +"')";
+  var name_div = document.getElementById('name')
+  name_div.href = tw_href;
+  name_div.innerHTML = current_intersect.name;
+  
+  var nick_div = document.getElementById('nick')
+  nick_div.href = tw_href;
+  nick_div.innerHTML = current_intersect.screenname;
+  document.getElementById('count').innerHTML=current_intersect.followers_count+'<span> Followers</span>'
+  document.getElementById('tw_details').href='http://www.time.mk/twitter/user/'+current_intersect.screenname;
+  document.getElementById('content_bottom').innerHTML=current_intersect.description
+  closest = document.getElementById('closest')
+  closest.innerHTML=''
+  
+  temp_particles = new THREE.Geometry();
+  
+  for (var i = 0; i < Math.min(current_intersect.nearest.length,25); i++) {
+    close_user = users[current_intersect.nearest[i]]
+    var tmpPosition = new THREE.Vector3(
+      close_user.position[0],
+      close_user.position[1],
+      close_user.position[2]
+    );
+  
+  
+    var tmpParticle = new Particle(tmpPosition);
+    tmpParticle.geometry.user_data = close_user;
+    
+    temp_particles.vertices.push(tmpParticle.geometry)
+    
+    
+    
+  }
+  
+  var click_material = new THREE.PointsMaterial({color: 0xcc0000,size:40.0});
+  sceneGL.remove(click_particle_system);
+  click_particle_system = new THREE.Points(temp_particles, click_material);
+  sceneGL.add(click_particle_system)
+  
+  
+  for (var i = 0; i < Math.min(current_intersect.nearest.length,10); i++) {
+    close_user = users[current_intersect.nearest[i]]
+  
+    closest.innerHTML+='@'+close_user.screenname+'<br>'
+  }
+}
+
 var control_method = 'mouse'
 
 function animate(){
@@ -255,6 +285,27 @@ function animate(){
 }
 
 function search(){
+  s_field = document.getElementById('search')
+  query = s_field.value
+  
+  for (var i = users.length - 1; i >= 0; i--) {
+    if (users[i].screenname.toLowerCase() == query.toLowerCase()){
+      vec = new THREE.Vector3(users[i].position[0], users[i].position[1], users[i].position[2])
+      mouse_controls.target = vec
+      
+      //cameraGL.lookAt(vec)
+      cameraGL.position.x=users[i].position[0];
+      cameraGL.position.y=users[i].position[1];
+      cameraGL.position.z=users[i].position[2];
+
+      cameraGL.translateZ(30)
+      //cameraGL.lookAt(new THREE.Vector3(users[i].position[0], users[i].position[1], users[i].position[2]))
+      click_person(users[i])
+      break;
+    }
+  }
+  
+  
 }
 
 function toggle_control_method(){
@@ -292,14 +343,21 @@ function CreateParticles(data){
   //console.log(minZ + ' ' + maxZ);
 
   for (var i=0; i<data.length; i++){
+      
+    data[i].position[0] = scaleValue(data[i].position[0], -scale, +scale, minX, maxX);
+    data[i].position[1] = scaleValue(data[i].position[1], -scale, +scale, minY, maxY);
+    data[i].position[2] = scaleValue(data[i].position[2], -scale, +scale, minZ, maxZ);
+  
     var tmpPosition = new THREE.Vector3(
-      scaleValue(data[i].position[0], -scale, +scale, minX, maxX), 
-      scaleValue(data[i].position[1], -scale, +scale, minY, maxY),
-      scaleValue(data[i].position[2], -scale, +scale, minZ, maxZ)
+      data[i].position[0],
+      data[i].position[1],
+      data[i].position[2]
     );
-
+  
+  
     var tmpParticle = new Particle(tmpPosition);
     tmpParticle.geometry.user_data = data[i];
+  
     part.push(tmpParticle);         
   }
 
