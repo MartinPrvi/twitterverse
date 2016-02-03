@@ -78,9 +78,26 @@ function init(){
   
 
   // var tmpParticles = RandomParticles(1000, -100, 100, 10);
-  var tmpParticles = CreateParticles(communication_data);
+  var tmpParticles = CreateParticles(data);
   //var tmpParticles = CreateParticles(data);
 
+  var near_dicks = {};
+  for (var i=0, n = tmpParticles.length; i<n; i++){
+    var temp_particle = tmpParticles[i];
+    var temp_key = '' + parseFloat(temp_particle.geometry.x / 10).toFixed(0) + ' ' + parseFloat(temp_particle.geometry.y / 10).toFixed(0) + ' ' + parseFloat(temp_particle.geometry.z / 10).toFixed(0);
+
+    if (temp_key in near_dicks){
+      var delta_x = (2.0 * Math.random() - 1.0) * 15;
+      temp_particle.geometry.x += delta_x;
+      var delta_y = (2.0 * Math.random() - 1.0) * 15;
+      temp_particle.geometry.y += delta_y;
+      var delta_z = (2.0 * Math.random() - 1.0) * 15;
+      temp_particle.geometry.z += delta_z;
+
+    } else {
+      near_dicks[temp_key] = 1;
+    }
+  }
   //console.log(tmpParticles);
 
   for (var i=0, n=tmpParticles.length; i<n; i++){
@@ -90,7 +107,7 @@ function init(){
   var material = new THREE.PointsMaterial({color: 0xfffffa,size:3.0});
   var particleSystem = new THREE.Points(particles, material);
   sceneGL.add(particleSystem);
-  sceneGL.fog = new THREE.FogExp2(0xefd1b5,0.0025)
+  // sceneGL.fog = new THREE.FogExp2(0x99999999,0.0025);
   window.addEventListener("mousemove", function(){
     event.preventDefault();
 
@@ -110,7 +127,7 @@ function init(){
     if (intersects.length > 0){
       current_intersect = intersects[0].object.geometry.vertices[intersects[0].index]
       sceneGL.remove(temp_particle_system);
-      var temp_material = new THREE.PointsMaterial({color: 0xcc8800,size:4.0});
+      var temp_material = new THREE.PointsMaterial({color: 0xcc8800,size:10.0});
       temp_particles = new THREE.Geometry();
       
       for (var i = 0; i < Math.min(current_intersect.user_data.nearest.length,10); i++) {
@@ -179,7 +196,7 @@ function init(){
       closest = document.getElementById('closest')
       closest.innerHTML=''
       
-      var click_material = new THREE.PointsMaterial({color: 0xcc0000,size:5.0});
+      var click_material = new THREE.PointsMaterial({color: 0xcc0000,size:20.0});
       sceneGL.remove(click_particle_system);
       click_particle_system = new THREE.Points(temp_particles, click_material);
       sceneGL.add(click_particle_system)
@@ -251,7 +268,7 @@ function toggle_control_method(){
 
 function CreateParticles(data){
   var part = new Array();
-  var scale = 1000.0;
+  var scale = 3000.0;
 
   var minX = +Infinity;
   var maxX = -Infinity;
