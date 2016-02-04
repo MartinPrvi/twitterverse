@@ -87,17 +87,18 @@ def distance_user_communications(new_users, user_coms):
       user_j = new_users[j]['id']
 
       if user_j not in user_coms[user_i] and user_i not in user_coms[user_j]:
-        distance_matrix[i, j] = np.Inf
+        distance_matrix[i, j] = 0.0
+        distance_matrix[j, i] = 0.0
       else:
         user_i_count = user_coms[user_i].get(user_j, 0.0)
         user_j_count = user_coms[user_j].get(user_i, 0.0)
 
-        distance_matrix[i, j] = weighted_mean_distance([user_i_count, user_j_count], [1.0, 1.0])
+        distance = weighted_mean_distance([user_i_count, user_j_count], [1.0, 1.0])
+        distance_matrix[i, j] = distance
+        distance_matrix[j, i] = distance
 
-  for i in xrange(distance_matrix.shape[0]):
-    for j in xrange(distance_matrix.shape[1]):
-      if i > j:
-        distance_matrix[i, j] = distance_matrix[j, i]
+  distance_matrix = np.max(distance_matrix) - distance_matrix
+  np.fill_diagonal(distance_matrix, 0.0)
 
   return distance_matrix
 
@@ -112,7 +113,7 @@ def weighted_mean_distance(x, w):
   num = sum([x[i] * w[i] for i in xrange(len(x))])
   den = sum(w)
 
-  return 1.0 / (float(num) / float(den))
+  return float(num) / float(den)
 
 #==================================================================================================
 
@@ -305,15 +306,6 @@ def merge_user_tweets(users_id, tweets, new_users):
 #==================================================================================================
 
 def main():
-  '''Reduce Dimensionality'''
-  # distances = np.array(pickle.load(open('Data/distances.cPickle', 'rb')))
-  # distances[distances < 0.0] = 0.0
-  # distances = np.nan_to_num(distances)
-
-  # print 'Started calculating'
-  # reduced_dimensionality = reduce_dimensionality(distances)
-
-  # pickle.dump(reduced_dimensionality, open('reduced_dimensionality.cPickle', 'wb'))
   #================================================================================================
   '''Generate User Coms'''
   # tweets = pickle.load(open('Data/mk_tweets_2015.cPickle', 'rb'))
@@ -325,11 +317,21 @@ def main():
   #================================================================================================
   '''Generate Distance Matrix'''
   # new_users = pickle.load(open('Data/new_users.cPickle', 'rb'))
-  # user_coms = pickle.load(open('user_coms.cPickle', 'rb'))
+  # user_coms = pickle.load(open('Data/user_coms.cPickle', 'rb'))
 
   # distance_matrix = distance_user_communications(new_users, user_coms)
 
-  # pickle.dump(distance_matrix, open('distance_users_com.cPickle', 'wb'), pickle.HIGHEST_PROTOCOL)
+  # pickle.dump(distance_matrix, open('v7_weighted_minus_distance_users_com.cPickle', 'wb'), pickle.HIGHEST_PROTOCOL)
+  #================================================================================================
+  '''Reduce Dimensionality'''
+  distances = np.array(pickle.load(open('v7_weighted_minus_distance_users_com.cPickle', 'rb')))
+  distances[distances < 0.0] = 0.0
+  distances = np.nan_to_num(distances)
+
+  print 'Started calculating'
+  reduced_dimensionality = reduce_dimensionality(distances)
+
+  pickle.dump(reduced_dimensionality, open('v6_weighted_minus_user_com_reduced_dimensionality.cPickle', 'wb'))
 
 if __name__=='__main__':
   main()
