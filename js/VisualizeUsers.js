@@ -12,16 +12,25 @@ var particles = new THREE.Geometry();
 var temp_particles = null;
 var temp_material = new THREE.PointsMaterial({color: 0xcc0000});
 
+var hover_particles = null;
+var hover_material = new THREE.PointsMaterial({color: 0x00cc00, size: 15.0});
+
+var selected_particles = null;
+var selected_material = new THREE.PointsMaterial({color: 0x00cc00, size: 40.0});
+
 var raycaster = new THREE.Raycaster();
 
 // var colors = getColors(3419, 10);
 var temp_particle_system = null
 var click_particle_system = null
 
+var hover_particle_system = null
+var selected_particle_system = null
+
 function init(){
-  //users = data;
+  users = data;
   
-  users = communication_data_W_minus
+  // users = communication_data_W_minus
 
   // Initialize the CLOCK (time)
   clock = new THREE.Clock();
@@ -133,6 +142,7 @@ function init(){
     if (intersects.length > 0){
       current_intersect = intersects[0].object.geometry.vertices[intersects[0].index]
       sceneGL.remove(temp_particle_system);
+      sceneGL.remove(hover_particle_system)
       var temp_material = new THREE.PointsMaterial({color: 0xcc8800,size:20.0});
       temp_particles = new THREE.Geometry();
       
@@ -147,6 +157,12 @@ function init(){
 
       temp_particle_system = new THREE.Points(temp_particles, temp_material);
       sceneGL.add(temp_particle_system);
+
+
+      hover_particles = new THREE.Geometry();
+      hover_particles.vertices.push(current_intersect);
+      hover_particle_system = new THREE.Points(hover_particles, hover_material);
+      sceneGL.add(hover_particle_system)
     
       var tooltip_html = []
       tooltip_html.push('<div class="tooltip">')
@@ -165,6 +181,9 @@ function init(){
       sceneCSS.remove(tooltip);
       sceneGL.remove(temp_particle_system);
       temp_particle_system=null
+
+      sceneGL.remove(hover_particle_system)
+      hover_particle_system
     }
     
   });
@@ -255,6 +274,20 @@ function click_person(current_intersect){
   sceneGL.remove(click_particle_system);
   click_particle_system = new THREE.Points(temp_particles, click_material);
   sceneGL.add(click_particle_system)
+
+  var tmpPosition = new THREE.Vector3(
+    current_intersect.position[0],
+    current_intersect.position[1],
+    current_intersect.position[2]
+  )
+  var tmpParticle = new Particle(tmpPosition);
+  tmpParticle.geometry.user_data = current_intersect;
+
+  selected_particles = new THREE.Geometry();
+  selected_particles.vertices.push(tmpParticle.geometry);
+  sceneGL.remove(selected_particle_system)
+  selected_particle_system = new THREE.Points(selected_particles, selected_material);
+  sceneGL.add(selected_particle_system)
   
   
   for (var i = 0; i < Math.min(current_intersect.nearest.length,10); i++) {
