@@ -28,10 +28,26 @@ var hover_particle_system = null
 var selected_particle_system = null
 
 function init(){
-  users = data;
+  //users = data;
   
-  // users = communication_data_W_minus
+  
+  
+  //================================================
 
+  //users = communication_data_W_minus
+  //document.title=='Communication (w_minus)'
+  
+  //users = communication_data_weighted
+  //document.title='Communication (weighted)'
+  
+  users = tfidf_distance_data
+  document.title='Communication (tf_idf cos)'
+  
+  //================================================
+ 
+ 
+ 
+ 
   // Initialize the CLOCK (time)
   clock = new THREE.Clock();
 
