@@ -38,7 +38,7 @@ function init(){
   //document.title=='Communication (w_minus)'
   
   users = communication_data_max
-  document.title=='Communication (max)'
+  document.title='Communication (max)'
   
   //users = communication_data_weighted
   //document.title='Communication (weighted)'
