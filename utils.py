@@ -100,7 +100,7 @@ def distance_user_communications(new_users, user_coms):
         distance_matrix[j, i] = distance
 
   distance_matrix = np.nan_to_num(distance_matrix)
-  distance_matrix[distance_matrix<0.0] = distance_matrix
+  distance_matrix[distance_matrix<0.0] = 0.0
   # distance_matrix = np.max(distance_matrix) - distance_matrix
   # np.fill_diagonal(distance_matrix, 0.0)
 
