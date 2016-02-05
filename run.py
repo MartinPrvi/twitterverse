@@ -37,10 +37,10 @@ def generate_json(users, reduced_dimensionality, distances, count, file_name, da
 
 def main():
   new_users = pickle.load(open('Data/processed/users_filtered.cPickle'))
-  reduced_dimensionality = pickle.load(open('Data/processed/weighted_inverse_user_com_reduced_dimensionality_v1.cPickle'))
-  distances = pickle.load(open('Data/processed/weighted_inverse_distance_users_com_v1.cPickle'))
+  reduced_dimensionality = pickle.load(open('Data/processed/max_inverse_user_com_reduced_dimensionality_v1.cPickle'))
+  distances = pickle.load(open('Data/processed/max_inverse_distance_users_com_v1.cPickle'))
 
-  generate_json(new_users, reduced_dimensionality, distances, 25, 'communication_data_weighted.json', 'communication_data_weighted')
+  generate_json(new_users, reduced_dimensionality, distances, 25, 'communication_data_max.json', 'communication_data_max')
 
 if __name__=='__main__':
   main()

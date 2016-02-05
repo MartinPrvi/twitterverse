@@ -95,7 +95,7 @@ def distance_user_communications(new_users, user_coms):
         user_i_count = user_coms[user_i].get(user_j, 0.0)
         user_j_count = user_coms[user_j].get(user_i, 0.0)
 
-        distance = 1.0 / float(weighted_mean_distance([user_i_count, user_j_count], [1.0, 1.0]))
+        distance = 1.0 / max([user_i_count, user_j_count])
         distance_matrix[i, j] = distance
         distance_matrix[j, i] = distance
 
@@ -391,7 +391,7 @@ def main():
   print 'start distance matrix'
   distance_matrix = distance_user_communications(users, user_coms)
   print 'finish distance matrix'
-  pickle.dump(distance_matrix, open('Data/processed/weighted_inverse_distance_users_com_v1.cPickle', 'wb'), 2)
+  pickle.dump(distance_matrix, open('Data/processed/max_inverse_distance_users_com_v1.cPickle', 'wb'), 2)
   
   # #distance_matrix = pickle.load(open('Data/processed/weighted_minus_distance_users_com_v1.cPickle','rb'))
   print 'dumped distance matrix'
@@ -406,7 +406,7 @@ def main():
   reduced_dimensionality = reduce_dimensionality(distance_matrix)
   print 'finish calculating reduce dimensionality'
 
-  pickle.dump(reduced_dimensionality, open('Data/processed/weighted_inverse_user_com_reduced_dimensionality_v1.cPickle', 'wb'))
+  pickle.dump(reduced_dimensionality, open('Data/processed/max_inverse_user_com_reduced_dimensionality_v1.cPickle', 'wb'))
   print 'dumped reduce dimensionality'
 
 if __name__=='__main__':
