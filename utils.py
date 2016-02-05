@@ -9,6 +9,8 @@ import numpy as np
 
 from sklearn.manifold import TSNE
 
+from Data import clean_dump
+
 hash_tags_re = re.compile(r'(?u)#\w+') # Used to find all hash tags within tweet
 user_tags_re = re.compile(r'(?u)@\w+') # Used to find all users taged in tweet
 tokenizer_re = re.compile(r'(?u)\w+') # Used to tokenize texts
@@ -216,7 +218,7 @@ def tokenize_text(text):
 
 #==================================================================================================
 
-def filter_users_ids(users, tweets):
+def filter_users_ids(users, tweets,min_tweets = 0):
   """
     Filters out users that don't have tweets and that the ALIEN tag is set to None
 
@@ -234,12 +236,13 @@ def filter_users_ids(users, tweets):
   """
   users_id = {}
   for tweet in tweets:
-    users_id[tweet['user']] = 1
+    users_id[tweet['user']] = users_id.get(tweet['user'],0)+1
 
   for user in users:
-    if user['id'] in users_id:
-      if user['ALIEN'] == None:
+    if users_id.get(user['id'],0) < min_tweets:
+      if user['id'] in users_id:
         del users_id[user['id']]
+
 
   return users_id
 
@@ -306,32 +309,63 @@ def merge_user_tweets(users_id, tweets, new_users):
 #==================================================================================================
 
 def main():
+  
+  #clean_dump.run()
+  print 'clean_dump finished ====================================='
+  users = pickle.load(open('Data/export/users.cPickle','rb'))
+  #users = clean_dump.users
+  print 'loaded users'
+  tweets = pickle.load(open('Data/export/tweets.cPickle','rb'))
+  #tweets = clean_dump.tweets
+  print 'loaded tweets'
+  
+  
+  #================================================================================================
+  '''Filter User Ids'''
+  users_id = filter_users_ids(users, tweets,min_tweets = 20)
+  print len(users)
+  users = filter_users(users, users_id)
+  print len(users)
+  print 'filtered users'
+  
+  pickle.dump(users, open('Data/processed/users_filtered.cPickle', 'wb'), 2)
+  print 'dumped users'
+  
   #================================================================================================
   '''Generate User Coms'''
   # tweets = pickle.load(open('Data/mk_tweets_2015.cPickle', 'rb'))
   # new_users = pickle.load(open('Data/new_users.cPickle', 'rb'))
-
-  # user_coms = user_communications(tweets, new_users)
-
-  # pickle.dump(user_coms, open('user_coms.cPickle', 'wb'), pickle.HIGHEST_PROTOCOL)
+  print 'user_communications'
+  user_coms = user_communications(tweets, users)
+  print 'dumping user_communications'
+  pickle.dump(user_coms, open('Data/processed/user_coms.cPickle', 'wb'), pickle.HIGHEST_PROTOCOL)
+  print 'done user_communications'
+  
   #================================================================================================
   '''Generate Distance Matrix'''
   # new_users = pickle.load(open('Data/new_users.cPickle', 'rb'))
   # user_coms = pickle.load(open('Data/user_coms.cPickle', 'rb'))
 
-  # distance_matrix = distance_user_communications(new_users, user_coms)
-
-  # pickle.dump(distance_matrix, open('v7_weighted_minus_distance_users_com.cPickle', 'wb'), pickle.HIGHEST_PROTOCOL)
+  print 'start distance matrix'
+  distance_matrix = distance_user_communications(users, user_coms)
+  print 'finish distance matrix'
+  pickle.dump(distance_matrix, open('Data/processed/weighted_minus_distance_users_com_v1.cPickle', 'wb'), 2)
+  
+  #distance_matrix = pickle.load(open('Data/processed/weighted_minus_distance_users_com_v1.cPickle','rb'))
+  print 'dumped distance matrix'
   #================================================================================================
   '''Reduce Dimensionality'''
-  distances = np.array(pickle.load(open('v7_weighted_minus_distance_users_com.cPickle', 'rb')))
-  distances[distances < 0.0] = 0.0
-  distances = np.nan_to_num(distances)
+  print 'start reduce dimensionality'
+  #distance_matrix = np.array(pickle.load(open('v7_weighted_minus_distance_users_com.cPickle', 'rb')))
+  distance_matrix[distance_matrix < 0.0] = 0.0
+  distance_matrix = np.nan_to_num(distance_matrix)
 
-  print 'Started calculating'
-  reduced_dimensionality = reduce_dimensionality(distances)
+  print 'started calculating reduce dimensionality'
+  reduced_dimensionality = reduce_dimensionality(distance_matrix)
+  print 'finish calculating reduce dimensionality'
 
-  pickle.dump(reduced_dimensionality, open('v6_weighted_minus_user_com_reduced_dimensionality.cPickle', 'wb'))
+  pickle.dump(reduced_dimensionality, open('Data/processed/weighted_minus_user_com_reduced_dimensionality_v1.cPickle', 'wb'))
+  print 'dumped reduce dimensionality'
 
 if __name__=='__main__':
   main()

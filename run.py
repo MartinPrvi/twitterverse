@@ -36,11 +36,11 @@ def generate_json(users, reduced_dimensionality, distances, count, file_name, da
 #==================================================================================================
 
 def main():
-  new_users = pickle.load(open('Data/new_users.cPickle'))
-  reduced_dimensionality = pickle.load(open('Data/reduced_dimensionality_communication.cPickle'))
-  distances = pickle.load(open('Data/distance_users_com.cPickle'))
+  new_users = pickle.load(open('Data/processed/users_filtered.cPickle'))
+  reduced_dimensionality = pickle.load(open('Data/processed/weighted_minus_user_com_reduced_dimensionality_v1.cPickle'))
+  distances = pickle.load(open('Data/processed/weighted_minus_distance_users_com_v1.cPickle'))
 
-  generate_json(new_users, reduced_dimensionality, distances, 25, 'communication_data.json', 'communication_data')
+  generate_json(new_users, reduced_dimensionality, distances, 25, 'communication_data_W_minus.json', 'communication_data_W_minus')
 
 if __name__=='__main__':
   main()

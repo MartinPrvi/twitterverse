@@ -19,8 +19,10 @@ var temp_particle_system = null
 var click_particle_system = null
 
 function init(){
-  users = data;
-  //users = communication_data
+  //users = data;
+  
+  users = communication_data_W_minus
+
   // Initialize the CLOCK (time)
   clock = new THREE.Clock();
 

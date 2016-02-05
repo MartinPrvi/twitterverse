@@ -19,7 +19,6 @@ def clean_users():
   remove_fields = [ '_id',
                     'created_at',
                     'favourites_count',
-                    'followers_count',
                     'friends_count',
                     'location',
                     'statuses_count',
@@ -76,7 +75,7 @@ def clean_tweets():
 #==================================================================================================
 
 def decode_bson(collection):
-  with open(collection+'.bson','rb') as f:
+  with open('Data/'+collection+'.bson','rb') as f:
     data = bson.decode_all(f.read())
   print 'decoded',collection,'bson'
   return data
@@ -87,20 +86,21 @@ def decode_bson(collection):
 def run():
   global users
   global tweets
-  #users   = decode_bson('users')
-  #tweets  = decode_bson('tweets')
+  users   = decode_bson('users')
+  tweets  = decode_bson('tweets')
   
   
   clean_users()
-  cPickle.dump(users,open('export/users.cPickle','wb'),2)
-  del users
+  cPickle.dump(users,open('Data/export/users.cPickle','wb'),2)
+
   print 'dump users'
 
   clean_tweets()
-  cPickle.dump(tweets,open('export/tweets.cPickle','wb'),2)
+  cPickle.dump(tweets,open('Data/export/tweets.cPickle','wb'),2)
   print 'dump tweets'
   
   
   
 #==================================================================================================
-run()
+if __name__ == "__main__":
+  run()

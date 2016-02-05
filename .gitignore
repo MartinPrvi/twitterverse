@@ -1,3 +1,4 @@
 *.pyc
 /Data/*.bson
 /Data/export/
+/Data/processed/
