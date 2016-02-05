@@ -309,63 +309,101 @@ def merge_user_tweets(users_id, tweets, new_users):
 #==================================================================================================
 
 def main():
-  
-  #clean_dump.run()
-  print 'clean_dump finished ====================================='
-  users = pickle.load(open('Data/export/users.cPickle','rb'))
-  #users = clean_dump.users
-  print 'loaded users'
-  tweets = pickle.load(open('Data/export/tweets.cPickle','rb'))
-  #tweets = clean_dump.tweets
-  print 'loaded tweets'
-  
-  
-  #================================================================================================
-  '''Filter User Ids'''
-  users_id = filter_users_ids(users, tweets,min_tweets = 20)
-  print len(users)
-  users = filter_users(users, users_id)
-  print len(users)
-  print 'filtered users'
-  
-  pickle.dump(users, open('Data/processed/users_filtered.cPickle', 'wb'), 2)
-  print 'dumped users'
-  
-  #================================================================================================
-  '''Generate User Coms'''
-  # tweets = pickle.load(open('Data/mk_tweets_2015.cPickle', 'rb'))
-  # new_users = pickle.load(open('Data/new_users.cPickle', 'rb'))
-  print 'user_communications'
-  user_coms = user_communications(tweets, users)
-  print 'dumping user_communications'
-  pickle.dump(user_coms, open('Data/processed/user_coms.cPickle', 'wb'), pickle.HIGHEST_PROTOCOL)
-  print 'done user_communications'
-  
-  #================================================================================================
-  '''Generate Distance Matrix'''
-  # new_users = pickle.load(open('Data/new_users.cPickle', 'rb'))
-  # user_coms = pickle.load(open('Data/user_coms.cPickle', 'rb'))
+  '''Merge Tweets'''
+  users = pickle.load(open('Data/processed/users_filtered.cPickle', 'rb'))
+  tweets = pickle.load(open('Data/export/tweets.cPickle', 'rb'))
 
-  print 'start distance matrix'
-  distance_matrix = distance_user_communications(users, user_coms)
-  print 'finish distance matrix'
-  pickle.dump(distance_matrix, open('Data/processed/weighted_minus_distance_users_com_v1.cPickle', 'wb'), 2)
-  
-  #distance_matrix = pickle.load(open('Data/processed/weighted_minus_distance_users_com_v1.cPickle','rb'))
-  print 'dumped distance matrix'
-  #================================================================================================
+  user_ids = {}
+  for user in users:
+    user_ids[user['id']] = 1
+
+  merged_user_tweets = merge_user_tweets(user_ids, tweets, user_ids)
+  print 'merged tweets'
+
+  pickle.dump(merged_user_tweets, open('Data/processed/merged_tweets.cPickle', 'wb'), 2)
+  print 'dumped tweets'
+
+  '''Calculating TFIDF Scores'''
+  print 'started calculating tfidf'
+  tfidf_scores, vocab_size = calculate_tfidf(merged_user_tweets)
+  print 'done calculating tfidf'
+
+  pickle.dump((tfidf_scores, vocab_size), open('Data/processed/tfidf_scores.cPickle', 'wb'), 2)
+  print 'dumped tfidf scores'
+
+  '''Calculating distance'''
+  print 'started calculating distance'
+  distance = np.array(calculate_distance(tfidf_scores, vocab_size))
+  distance[distance<0.0] = 0.0
+  print 'done calculating distance'
+
+  pickle.dump(distance, open('Data/processed/tfidf_distance.cPickle', 'wb'), 2)
+  print 'dumped tfidf distance'
+
   '''Reduce Dimensionality'''
-  print 'start reduce dimensionality'
-  #distance_matrix = np.array(pickle.load(open('v7_weighted_minus_distance_users_com.cPickle', 'rb')))
-  distance_matrix[distance_matrix < 0.0] = 0.0
-  distance_matrix = np.nan_to_num(distance_matrix)
-
   print 'started calculating reduce dimensionality'
-  reduced_dimensionality = reduce_dimensionality(distance_matrix)
+  reduced_dimensionality = reduce_dimensionality(distance)
   print 'finish calculating reduce dimensionality'
 
-  pickle.dump(reduced_dimensionality, open('Data/processed/weighted_minus_user_com_reduced_dimensionality_v1.cPickle', 'wb'))
+  pickle.dump(reduced_dimensionality, open('Data/processed/tfidf_distance_reduced_dimensionality_v1.cPickle', 'wb'))
   print 'dumped reduce dimensionality'
+
+  # #clean_dump.run()
+  # print 'clean_dump finished ====================================='
+  # users = pickle.load(open('Data/export/users.cPickle','rb'))
+  # #users = clean_dump.users
+  # print 'loaded users'
+  # tweets = pickle.load(open('Data/export/tweets.cPickle','rb'))
+  # #tweets = clean_dump.tweets
+  # print 'loaded tweets'
+  
+  
+  # #================================================================================================
+  # '''Filter User Ids'''
+  # users_id = filter_users_ids(users, tweets,min_tweets = 20)
+  # print len(users)
+  # users = filter_users(users, users_id)
+  # print len(users)
+  # print 'filtered users'
+  
+  # pickle.dump(users, open('Data/processed/users_filtered.cPickle', 'wb'), 2)
+  # print 'dumped users'
+  
+  # #================================================================================================
+  # '''Generate User Coms'''
+  # # tweets = pickle.load(open('Data/mk_tweets_2015.cPickle', 'rb'))
+  # # new_users = pickle.load(open('Data/new_users.cPickle', 'rb'))
+  # print 'user_communications'
+  # user_coms = user_communications(tweets, users)
+  # print 'dumping user_communications'
+  # pickle.dump(user_coms, open('Data/processed/user_coms.cPickle', 'wb'), pickle.HIGHEST_PROTOCOL)
+  # print 'done user_communications'
+  
+  # #================================================================================================
+  # '''Generate Distance Matrix'''
+  # # new_users = pickle.load(open('Data/new_users.cPickle', 'rb'))
+  # # user_coms = pickle.load(open('Data/user_coms.cPickle', 'rb'))
+
+  # print 'start distance matrix'
+  # distance_matrix = distance_user_communications(users, user_coms)
+  # print 'finish distance matrix'
+  # pickle.dump(distance_matrix, open('Data/processed/weighted_minus_distance_users_com_v1.cPickle', 'wb'), 2)
+  
+  # #distance_matrix = pickle.load(open('Data/processed/weighted_minus_distance_users_com_v1.cPickle','rb'))
+  # print 'dumped distance matrix'
+  # #================================================================================================
+  # '''Reduce Dimensionality'''
+  # print 'start reduce dimensionality'
+  # #distance_matrix = np.array(pickle.load(open('v7_weighted_minus_distance_users_com.cPickle', 'rb')))
+  # distance_matrix[distance_matrix < 0.0] = 0.0
+  # distance_matrix = np.nan_to_num(distance_matrix)
+
+  # print 'started calculating reduce dimensionality'
+  # reduced_dimensionality = reduce_dimensionality(distance_matrix)
+  # print 'finish calculating reduce dimensionality'
+
+  # pickle.dump(reduced_dimensionality, open('Data/processed/weighted_minus_user_com_reduced_dimensionality_v1.cPickle', 'wb'))
+  # print 'dumped reduce dimensionality'
 
 if __name__=='__main__':
   main()
