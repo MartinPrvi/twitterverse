@@ -37,11 +37,14 @@ function init(){
   //users = communication_data_W_minus
   //document.title=='Communication (w_minus)'
   
+  users = communication_data_max
+  document.title=='Communication (max)'
+  
   //users = communication_data_weighted
   //document.title='Communication (weighted)'
   
-  users = tfidf_distance_data
-  document.title='Communication (tf_idf cos)'
+  //users = tfidf_distance_data
+  //document.title='Communication (tf_idf cos)'
   
   //================================================
  
